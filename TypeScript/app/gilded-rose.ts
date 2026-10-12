@@ -17,6 +17,65 @@ export class Item {
   }
 }
 
+type ItemUpdater = (item: Item) => void;
+
+function increaseQuality(item: Item) {
+  if (item.quality < MAX_QUALITY) {
+    item.quality = item.quality + 1;
+  }
+}
+
+function decreaseQuality(item: Item) {
+  if (item.quality > MIN_QUALITY) {
+    item.quality = item.quality - 1;
+  }
+}
+
+function updateNormalItem(item: Item) {
+  decreaseQuality(item);
+  item.sellIn = item.sellIn - 1;
+
+  if (item.sellIn < 0) {
+    decreaseQuality(item);
+  }
+}
+
+function updateAgedBrie(item: Item) {
+  increaseQuality(item);
+  item.sellIn = item.sellIn - 1;
+
+  if (item.sellIn < 0) {
+    increaseQuality(item);
+  }
+}
+
+function updateBackstagePasses(item: Item) {
+  increaseQuality(item);
+
+  if (item.sellIn < 11) {
+    increaseQuality(item);
+  }
+  if (item.sellIn < 6) {
+    increaseQuality(item);
+  }
+
+  item.sellIn = item.sellIn - 1;
+
+  if (item.sellIn < 0) {
+    item.quality = MIN_QUALITY;
+  }
+}
+
+// Sulfuras is legendary: it never has to be sold and never loses quality.
+function keepUnchanged(item: Item) {
+}
+
+const UPDATERS: { [name: string]: ItemUpdater } = {
+  [AGED_BRIE]: updateAgedBrie,
+  [BACKSTAGE_PASSES]: updateBackstagePasses,
+  [SULFURAS]: keepUnchanged
+};
+
 export class GildedRose {
   items: Array<Item>;
 
@@ -26,53 +85,10 @@ export class GildedRose {
 
   updateQuality() {
     for (const item of this.items) {
-      this.updateItem(item);
+      const update = UPDATERS[item.name] || updateNormalItem;
+      update(item);
     }
 
     return this.items;
-  }
-
-  private updateItem(item: Item) {
-    if (item.name == SULFURAS) {
-      return;
-    }
-
-    if (item.name == AGED_BRIE) {
-      this.increaseQuality(item);
-    } else if (item.name == BACKSTAGE_PASSES) {
-      this.increaseQuality(item);
-      if (item.sellIn < 11) {
-        this.increaseQuality(item);
-      }
-      if (item.sellIn < 6) {
-        this.increaseQuality(item);
-      }
-    } else {
-      this.decreaseQuality(item);
-    }
-
-    item.sellIn = item.sellIn - 1;
-
-    if (item.sellIn < 0) {
-      if (item.name == AGED_BRIE) {
-        this.increaseQuality(item);
-      } else if (item.name == BACKSTAGE_PASSES) {
-        item.quality = MIN_QUALITY;
-      } else {
-        this.decreaseQuality(item);
-      }
-    }
-  }
-
-  private increaseQuality(item: Item) {
-    if (item.quality < MAX_QUALITY) {
-      item.quality = item.quality + 1;
-    }
-  }
-
-  private decreaseQuality(item: Item) {
-    if (item.quality > MIN_QUALITY) {
-      item.quality = item.quality - 1;
-    }
   }
 }
