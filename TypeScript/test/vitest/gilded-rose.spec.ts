@@ -7,6 +7,7 @@ function updateOnce(name: string, sellIn: number, quality: number): Item {
 
 const SULFURAS = 'Sulfuras, Hand of Ragnaros';
 const BACKSTAGE = 'Backstage passes to a TAFKAL80ETC concert';
+const CONJURED = 'Conjured Mana Cake';
 
 describe('Gilded Rose', () => {
   it('should start with no items', () => {
@@ -61,5 +62,21 @@ describe('Gilded Rose', () => {
 
   it('should drop backstage passes to zero after the concert', () => {
     expect(updateOnce(BACKSTAGE, 0, 20).quality).toBe(0);
+  });
+
+  it('should degrade a conjured item twice as fast as a normal one', () => {
+    expect(updateOnce(CONJURED, 3, 10).quality).toBe(8);
+  });
+
+  it('should degrade a conjured item four times as fast after the sell by date', () => {
+    expect(updateOnce(CONJURED, 0, 10).quality).toBe(6);
+  });
+
+  it('should not take a conjured item below zero quality', () => {
+    expect(updateOnce(CONJURED, 0, 1).quality).toBe(0);
+  });
+
+  it('should treat any conjured product the same way', () => {
+    expect(updateOnce('Conjured Sword', 3, 10).quality).toBe(8);
   });
 });

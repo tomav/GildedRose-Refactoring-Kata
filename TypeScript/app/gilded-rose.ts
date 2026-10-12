@@ -1,6 +1,7 @@
 const AGED_BRIE = 'Aged Brie';
 const SULFURAS = 'Sulfuras, Hand of Ragnaros';
 const BACKSTAGE_PASSES = 'Backstage passes to a TAFKAL80ETC concert';
+const CONJURED_PREFIX = 'Conjured';
 
 const MIN_QUALITY = 0;
 const MAX_QUALITY = 50;
@@ -66,6 +67,17 @@ function updateBackstagePasses(item: Item) {
   }
 }
 
+function updateConjuredItem(item: Item) {
+  decreaseQuality(item);
+  decreaseQuality(item);
+  item.sellIn = item.sellIn - 1;
+
+  if (item.sellIn < 0) {
+    decreaseQuality(item);
+    decreaseQuality(item);
+  }
+}
+
 // Sulfuras is legendary: it never has to be sold and never loses quality.
 function keepUnchanged(item: Item) {
 }
@@ -76,6 +88,16 @@ const UPDATERS: { [name: string]: ItemUpdater } = {
   [SULFURAS]: keepUnchanged
 };
 
+// Conjured is a family of products rather than a single item, so it is matched
+// on the name prefix and not through the lookup.
+function updaterFor(item: Item): ItemUpdater {
+  if (item.name.startsWith(CONJURED_PREFIX)) {
+    return updateConjuredItem;
+  }
+
+  return UPDATERS[item.name] || updateNormalItem;
+}
+
 export class GildedRose {
   items: Array<Item>;
 
@@ -85,8 +107,7 @@ export class GildedRose {
 
   updateQuality() {
     for (const item of this.items) {
-      const update = UPDATERS[item.name] || updateNormalItem;
-      update(item);
+      updaterFor(item)(item);
     }
 
     return this.items;
