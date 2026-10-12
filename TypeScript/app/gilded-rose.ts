@@ -33,35 +33,33 @@ export class GildedRose {
   }
 
   private updateItem(item: Item) {
-    if (item.name != AGED_BRIE && item.name != BACKSTAGE_PASSES) {
-      if (item.name != SULFURAS) {
-        this.decreaseQuality(item);
+    if (item.name == SULFURAS) {
+      return;
+    }
+
+    if (item.name == AGED_BRIE) {
+      this.increaseQuality(item);
+    } else if (item.name == BACKSTAGE_PASSES) {
+      this.increaseQuality(item);
+      if (item.sellIn < 11) {
+        this.increaseQuality(item);
+      }
+      if (item.sellIn < 6) {
+        this.increaseQuality(item);
       }
     } else {
-      this.increaseQuality(item);
-      if (item.name == BACKSTAGE_PASSES) {
-        if (item.sellIn < 11) {
-          this.increaseQuality(item);
-        }
-        if (item.sellIn < 6) {
-          this.increaseQuality(item);
-        }
-      }
+      this.decreaseQuality(item);
     }
-    if (item.name != SULFURAS) {
-      item.sellIn = item.sellIn - 1;
-    }
+
+    item.sellIn = item.sellIn - 1;
+
     if (item.sellIn < 0) {
-      if (item.name != AGED_BRIE) {
-        if (item.name != BACKSTAGE_PASSES) {
-          if (item.name != SULFURAS) {
-            this.decreaseQuality(item);
-          }
-        } else {
-          item.quality = MIN_QUALITY;
-        }
-      } else {
+      if (item.name == AGED_BRIE) {
         this.increaseQuality(item);
+      } else if (item.name == BACKSTAGE_PASSES) {
+        item.quality = MIN_QUALITY;
+      } else {
+        this.decreaseQuality(item);
       }
     }
   }
