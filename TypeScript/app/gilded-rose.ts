@@ -2,6 +2,9 @@ const AGED_BRIE = 'Aged Brie';
 const SULFURAS = 'Sulfuras, Hand of Ragnaros';
 const BACKSTAGE_PASSES = 'Backstage passes to a TAFKAL80ETC concert';
 
+const MIN_QUALITY = 0;
+const MAX_QUALITY = 50;
+
 export class Item {
   name: string;
   sellIn: number;
@@ -31,25 +34,17 @@ export class GildedRose {
 
   private updateItem(item: Item) {
     if (item.name != AGED_BRIE && item.name != BACKSTAGE_PASSES) {
-      if (item.quality > 0) {
-        if (item.name != SULFURAS) {
-          item.quality = item.quality - 1
-        }
+      if (item.name != SULFURAS) {
+        this.decreaseQuality(item);
       }
     } else {
-      if (item.quality < 50) {
-        item.quality = item.quality + 1
-        if (item.name == BACKSTAGE_PASSES) {
-          if (item.sellIn < 11) {
-            if (item.quality < 50) {
-              item.quality = item.quality + 1
-            }
-          }
-          if (item.sellIn < 6) {
-            if (item.quality < 50) {
-              item.quality = item.quality + 1
-            }
-          }
+      this.increaseQuality(item);
+      if (item.name == BACKSTAGE_PASSES) {
+        if (item.sellIn < 11) {
+          this.increaseQuality(item);
+        }
+        if (item.sellIn < 6) {
+          this.increaseQuality(item);
         }
       }
     }
@@ -59,19 +54,27 @@ export class GildedRose {
     if (item.sellIn < 0) {
       if (item.name != AGED_BRIE) {
         if (item.name != BACKSTAGE_PASSES) {
-          if (item.quality > 0) {
-            if (item.name != SULFURAS) {
-              item.quality = item.quality - 1
-            }
+          if (item.name != SULFURAS) {
+            this.decreaseQuality(item);
           }
         } else {
-          item.quality = item.quality - item.quality
+          item.quality = MIN_QUALITY;
         }
       } else {
-        if (item.quality < 50) {
-          item.quality = item.quality + 1
-        }
+        this.increaseQuality(item);
       }
+    }
+  }
+
+  private increaseQuality(item: Item) {
+    if (item.quality < MAX_QUALITY) {
+      item.quality = item.quality + 1;
+    }
+  }
+
+  private decreaseQuality(item: Item) {
+    if (item.quality > MIN_QUALITY) {
+      item.quality = item.quality - 1;
     }
   }
 }
