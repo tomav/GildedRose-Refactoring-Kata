@@ -83,25 +83,27 @@ function updateConjuredItem(item: Item) {
 }
 
 // Sulfuras is legendary: it never has to be sold and never loses quality, so
-// there is nothing to do. The lookup entry below is still required: without it
-// the name falls through to updateNormalItem and the item starts degrading.
+// there is nothing to do.
 function keepUnchanged() {
 }
 
-const UPDATERS: { [name: string]: ItemUpdater } = {
-  [AGED_BRIE]: updateAgedBrie,
-  [BACKSTAGE_PASSES]: updateBackstagePasses,
-  [SULFURAS]: keepUnchanged
-};
-
-// Conjured is a family of products rather than a single item, so it is matched
-// on the name prefix and not through the lookup.
+// Conjured is a family of products rather than a single article, which is why
+// it is matched on the name prefix while the others are matched by name.
 function updaterFor(item: Item): ItemUpdater {
+  if (item.name === SULFURAS) {
+    return keepUnchanged;
+  }
+  if (item.name === AGED_BRIE) {
+    return updateAgedBrie;
+  }
+  if (item.name === BACKSTAGE_PASSES) {
+    return updateBackstagePasses;
+  }
   if (item.name.startsWith(CONJURED_PREFIX)) {
     return updateConjuredItem;
   }
 
-  return UPDATERS[item.name] || updateNormalItem;
+  return updateNormalItem;
 }
 
 export class GildedRose {
@@ -113,7 +115,8 @@ export class GildedRose {
 
   updateQuality() {
     for (const item of this.items) {
-      updaterFor(item)(item);
+      const update = updaterFor(item);
+      update(item);
     }
 
     return this.items;
