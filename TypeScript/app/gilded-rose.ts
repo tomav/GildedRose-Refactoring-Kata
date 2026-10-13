@@ -78,8 +78,10 @@ function updateConjuredItem(item: Item) {
   }
 }
 
-// Sulfuras is legendary: it never has to be sold and never loses quality.
-function keepUnchanged(item: Item) {
+// Sulfuras is legendary: it never has to be sold and never loses quality, so
+// there is nothing to do. The lookup entry below is still required: without it
+// the name falls through to updateNormalItem and the item starts degrading.
+function keepUnchanged() {
 }
 
 const UPDATERS: { [name: string]: ItemUpdater } = {
