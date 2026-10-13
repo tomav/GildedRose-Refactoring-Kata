@@ -32,9 +32,13 @@ function decreaseQuality(item: Item) {
   }
 }
 
+function decreaseSellIn(item: Item) {
+  item.sellIn = item.sellIn - 1;
+}
+
 function updateNormalItem(item: Item) {
   decreaseQuality(item);
-  item.sellIn = item.sellIn - 1;
+  decreaseSellIn(item);
 
   if (item.sellIn < 0) {
     decreaseQuality(item);
@@ -43,7 +47,7 @@ function updateNormalItem(item: Item) {
 
 function updateAgedBrie(item: Item) {
   increaseQuality(item);
-  item.sellIn = item.sellIn - 1;
+  decreaseSellIn(item);
 
   if (item.sellIn < 0) {
     increaseQuality(item);
@@ -60,7 +64,7 @@ function updateBackstagePasses(item: Item) {
     increaseQuality(item);
   }
 
-  item.sellIn = item.sellIn - 1;
+  decreaseSellIn(item);
 
   if (item.sellIn < 0) {
     item.quality = MIN_QUALITY;
@@ -70,7 +74,7 @@ function updateBackstagePasses(item: Item) {
 function updateConjuredItem(item: Item) {
   decreaseQuality(item);
   decreaseQuality(item);
-  item.sellIn = item.sellIn - 1;
+  decreaseSellIn(item);
 
   if (item.sellIn < 0) {
     decreaseQuality(item);
